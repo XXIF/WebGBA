@@ -1,0 +1,1186 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+
+:root {
+    --primary: #1c1c28;
+    --secondary: #2a2a3a;
+    --accent: #161624;
+    --highlight: #5c6bc0;
+    --surface: #151520;
+    --text: #ffffff;
+    --text-muted: #9090a0;
+    --blue-btn: #5c6bc0;
+    --green-a: #4caf50;
+    --red-b: #f44336;
+    --yellow-y: #ffc107;
+}
+
+body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 50%, var(--surface) 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    color: var(--text);
+}
+
+/* === KEYBOARD HELP MODAL === */
+.help-modal {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    backdrop-filter: blur(5px);
+}
+
+.help-modal.visible {
+    display: flex;
+}
+
+.help-modal-content {
+    background: var(--secondary);
+    border-radius: 16px;
+    padding: 30px;
+    max-width: 400px;
+    width: 90%;
+    border: 1px solid rgba(92, 107, 192, 0.3);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.help-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.help-modal-header h3 {
+    color: var(--highlight);
+    font-size: 1.2rem;
+}
+
+.help-modal-close {
+    width: 32px;
+    height: 32px;
+    background: rgba(244, 67, 54, 0.2);
+    border: 1px solid var(--red-b);
+    border-radius: 50%;
+    color: var(--red-b);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.help-modal-close i {
+    font-size: 14px;
+    line-height: 1;
+}
+
+.help-modal-close:hover {
+    background: var(--red-b);
+    color: #fff;
+}
+
+.help-section {
+    margin-bottom: 20px;
+}
+
+.help-section:last-child {
+    margin-bottom: 0;
+}
+
+.help-section h4 {
+    color: var(--text);
+    font-size: 0.9rem;
+    margin-bottom: 12px;
+}
+
+.help-key-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+.help-key {
+    background: var(--surface);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-family: monospace;
+    font-size: 0.8rem;
+    border: 1px solid #3a3a4e;
+    color: var(--text);
+    min-width: 32px;
+    text-align: center;
+}
+
+.help-label {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin-right: 8px;
+}
+
+/* === Main Screen === */
+.emulator-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+.screen-container {
+    position: relative;
+    padding: 4px;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+}
+
+.screen-bezel {
+    padding: 2px;
+    background: rgba(92, 107, 192, 0.3);
+    border-radius: 4px;
+    position: relative;
+}
+
+#screen {
+    display: block;
+    width: 720px;
+    height: 480px;
+    max-width: 100%;
+    max-height: calc(100vh - 60px);
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    border-radius: 4px;
+    background: #000;
+    object-fit: contain;
+}
+
+/* === Hidden File Input === */
+.file-input {
+    display: none;
+}
+
+/* === Load ROM Hint === */
+.load-hint {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(10, 10, 20, 0.95);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.load-hint.hidden {
+    display: none;
+}
+
+.load-hint:hover {
+    background: rgba(92, 107, 192, 0.2);
+}
+
+.load-hint.dragover {
+    background: rgba(92, 107, 192, 0.3);
+}
+
+.load-hint-icon {
+    font-size: 48px;
+    margin-bottom: 15px;
+}
+
+.load-hint h2 {
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.load-hint p {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+/* === Top Bar === */
+.top-bar {
+    position: fixed;
+    top: 15px;
+    left: 70px;
+    background: rgba(10, 10, 20, 0.95);
+    padding: 6px 10px;
+    border-radius: 12px;
+    z-index: 1009;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid rgba(92, 107, 192, 0.3);
+    opacity: 0;
+    transform: translateX(-20px);
+    pointer-events: none;
+    transition: all 0.3s ease;
+    max-width: calc(100vw - 100px);
+    overflow-x: auto;
+}
+
+.top-bar.visible {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+}
+
+.top-bar.hidden {
+    display: none;
+}
+
+/* === Top Bar Buttons === */
+.top-bar-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+    flex-shrink: 0;
+}
+
+.top-bar-btn-close {
+    background: rgba(244, 67, 54, 0.2);
+    border-color: var(--red-b);
+    color: var(--red-b);
+    font-size: 1rem;
+}
+
+.top-bar-btn-close:hover {
+    background: var(--red-b);
+    color: #fff;
+}
+
+.top-bar-btn-settings {
+    background: rgba(92, 107, 192, 0.2);
+    border-color: var(--highlight);
+    color: var(--highlight);
+    font-size: 0.9rem;
+}
+
+.top-bar-btn-settings:hover {
+    background: var(--highlight);
+    color: #fff;
+}
+
+.top-bar-btn-help {
+    background: rgba(76, 175, 80, 0.2);
+    border-color: var(--green-a);
+    color: var(--green-a);
+    font-size: 0.9rem;
+}
+
+.top-bar-btn-help:hover {
+    background: var(--green-a);
+    color: #fff;
+}
+
+/* === Top Bar Divider === */
+.top-bar-divider {
+    width: 1px;
+    height: 24px;
+    background: rgba(92, 107, 192, 0.3);
+    flex-shrink: 0;
+}
+
+/* === Top Bar Game Controls === */
+.top-bar-game-controls {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.top-bar-game-btn {
+    background: rgba(92, 107, 192, 0.15);
+    border: 1px solid rgba(92, 107, 192, 0.3);
+    color: var(--text);
+    padding: 4px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.top-bar-game-btn:hover {
+    background: rgba(92, 107, 192, 0.3);
+    border-color: var(--highlight);
+}
+
+/* === Top Bar Toggles === */
+.top-bar-toggles {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.top-bar-toggle-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    cursor: pointer;
+}
+
+.top-bar-toggle-item input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--highlight);
+    cursor: pointer;
+}
+
+/* === Status Bar === */
+.status-bar {
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    background: rgba(10, 10, 20, 0.9);
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    z-index: 1001;
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    border: 1px solid rgba(92, 107, 192, 0.2);
+    opacity: 0;
+    transform: translateX(20px);
+    pointer-events: none;
+    transition: all 0.3s ease;
+}
+
+.status-bar.visible {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+}
+
+.status-bar.hidden {
+    display: none;
+}
+
+.status-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.status-label {
+    color: var(--text);
+    font-weight: 500;
+}
+
+/* === Settings Panel === */
+.settings-panel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(10, 10, 20, 0.98);
+    border-radius: 4px;
+    z-index: 10;
+    border: none;
+    display: none;
+    flex-direction: column;
+}
+
+.settings-panel.visible {
+    display: flex;
+}
+
+/* === Settings Tabs === */
+.settings-tabs {
+    display: flex;
+    gap: 5px;
+    padding: 15px 15px 10px;
+    border-bottom: 1px solid rgba(92, 107, 192, 0.3);
+    overflow-x: auto;
+    flex-shrink: 0;
+}
+
+.settings-tabs::-webkit-scrollbar {
+    height: 4px;
+}
+
+.settings-tabs::-webkit-scrollbar-track {
+    background: rgba(92, 107, 192, 0.1);
+    border-radius: 2px;
+}
+
+.settings-tabs::-webkit-scrollbar-thumb {
+    background: rgba(92, 107, 192, 0.3);
+    border-radius: 2px;
+}
+
+.settings-tab {
+    flex: 1;
+    padding: 8px 10px;
+    background: rgba(92, 107, 192, 0.1);
+    border: none;
+    border-radius: 8px;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.settings-tab:hover {
+    background: rgba(92, 107, 192, 0.2);
+    color: var(--text);
+}
+
+.settings-tab.active {
+    background: var(--highlight);
+    color: #fff;
+}
+
+/* === Settings Content === */
+.settings-content {
+    flex: 1;
+    min-height: 150px;
+    padding: 15px 20px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.settings-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.settings-content::-webkit-scrollbar-track {
+    background: rgba(92, 107, 192, 0.1);
+    border-radius: 3px;
+}
+
+.settings-content::-webkit-scrollbar-thumb {
+    background: rgba(92, 107, 192, 0.3);
+    border-radius: 3px;
+}
+
+.settings-tab-content {
+    display: none;
+}
+
+.settings-tab-content.active {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.settings-column {
+    flex: 1;
+    min-width: 200px;
+}
+
+.settings-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.settings-row:last-child {
+    margin-bottom: 0;
+}
+
+.settings-panel h4 {
+    color: var(--highlight);
+    margin-bottom: 15px;
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.settings-group {
+    margin-bottom: 15px;
+}
+
+.settings-group:last-child {
+    margin-bottom: 0;
+}
+
+.settings-group label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text);
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+    cursor: pointer;
+}
+
+.settings-group label input[type="radio"] {
+    accent-color: var(--highlight);
+}
+
+.settings-group label input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--highlight);
+    cursor: pointer;
+}
+
+.settings-desc {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-left: 22px;
+    margin-top: -4px;
+    margin-bottom: 10px;
+}
+
+.speed-label {
+    color: var(--highlight);
+    font-size: 0.9rem;
+    min-width: 30px;
+    text-align: center;
+}
+
+#speedSlider {
+    flex: 1;
+    accent-color: var(--highlight);
+    width: 100%;
+    height: 24px;
+}
+
+.speed-control {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+}
+
+/* === FPS Overlay (top-left of game screen) === */
+.fps-overlay {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    z-index: 5;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.fps-overlay:not(.visible) {
+    opacity: 0;
+}
+
+.fps-overlay #fpsValue,
+.fps-overlay .fps-unit {
+    color: #ff69b4;
+    font-weight: bold;
+    font-size: 0.85rem;
+    font-variant-numeric: tabular-nums;
+    font-family: 'Courier New', monospace;
+    text-shadow:
+        -1px -1px 0 #fff,
+         1px -1px 0 #fff,
+        -1px  1px 0 #fff,
+         1px  1px 0 #fff;
+}
+
+/* === Settings Buttons === */
+.settings-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 8px;
+    background: rgba(92, 107, 192, 0.1);
+    border: 1px solid rgba(92, 107, 192, 0.3);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.settings-btn:hover {
+    background: rgba(92, 107, 192, 0.2);
+    border-color: var(--highlight);
+}
+
+.settings-btn i {
+    width: 20px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.settings-btn-danger {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.5);
+    color: #ef4444;
+}
+
+.settings-btn-danger:hover {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: #ef4444;
+}
+
+.settings-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+    background: rgba(55, 65, 81, 0.2);
+    border-color: rgba(75, 85, 99, 0.3);
+}
+
+.settings-btn:disabled:hover {
+    background: rgba(55, 65, 81, 0.2);
+    border-color: rgba(75, 85, 99, 0.3);
+}
+
+/* === Settings Help === */
+.settings-help {
+    padding: 12px 20px;
+    border-top: 1px solid rgba(92, 107, 192, 0.3);
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: color 0.2s ease;
+    flex-shrink: 0;
+}
+
+.settings-help:hover {
+    color: var(--highlight);
+}
+
+/* === Switch Toggle === */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 48px;
+    height: 26px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(92, 107, 192, 0.3);
+    transition: 0.3s;
+    border-radius: 26px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 4px;
+    bottom: 4px;
+    background-color: #fff;
+    transition: 0.3s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: var(--highlight);
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 1px var(--highlight);
+}
+
+input:checked + .slider:before {
+    transform: translateX(22px);
+}
+
+.switch-label {
+    margin-left: 10px;
+    color: var(--text);
+    font-size: 0.85rem;
+    vertical-align: middle;
+}
+
+/* === Virtual Gamepad === */
+.gamepad-container {
+    position: fixed;
+    bottom: 60px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 40px;
+    z-index: 100;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.gamepad-container:not(.visible) {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.gamepad-container.visible .gamepad-half {
+    pointer-events: auto;
+}
+
+.gamepad-half {
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* === D-Pad (Cross) === */
+.dpad-container {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    display: none;
+}
+
+.dpad-container.visible {
+    display: block;
+}
+
+.dpad-base {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle, rgba(50, 50, 70, 0.95), rgba(30, 30, 50, 0.95));
+    border: 3px solid rgba(92, 107, 192, 0.5);
+    border-radius: 50%;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6), inset 0 0 25px rgba(0, 0, 0, 0.4);
+}
+
+.dpad-btn {
+    position: absolute;
+    background: linear-gradient(145deg, #3a3a4e, #2a2a3e);
+    border: 2px solid #4a4a5e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.1s ease;
+    touch-action: manipulation;
+}
+
+.dpad-btn:active,
+.dpad-btn.pressed {
+    background: linear-gradient(145deg, #7986cb, var(--highlight));
+    border-color: var(--highlight);
+    color: #fff;
+}
+
+.dpad-up {
+    top: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 40px;
+    border-radius: 8px 8px 4px 4px;
+}
+
+.dpad-down {
+    bottom: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 40px;
+    border-radius: 4px 4px 8px 8px;
+}
+
+.dpad-left {
+    left: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    border-radius: 8px 4px 4px 8px;
+}
+
+.dpad-right {
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    border-radius: 4px 8px 8px 4px;
+}
+
+/* === Virtual Joystick === */
+.joystick-container {
+    position: relative;
+    width: 140px;
+    height: 140px;
+}
+
+.joystick-container.hidden {
+    display: none;
+}
+
+.joystick-base {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 140px;
+    height: 140px;
+    background: radial-gradient(circle, rgba(50, 50, 70, 0.95), rgba(30, 30, 50, 0.95));
+    border: 3px solid rgba(92, 107, 192, 0.5);
+    border-radius: 50%;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6), inset 0 0 25px rgba(0, 0, 0, 0.4);
+}
+
+.joystick-handle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 60px;
+    height: 60px;
+    background: radial-gradient(circle at 30% 30%, var(--highlight), #4c5ab0);
+    border: 3px solid #7986cb;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 4px 15px rgba(92, 107, 192, 0.5), inset 0 0 15px rgba(255, 255, 255, 0.15);
+    transition: box-shadow 0.1s ease;
+}
+
+.joystick-handle.active {
+    box-shadow: 0 6px 20px rgba(92, 107, 192, 0.7), inset 0 0 20px rgba(255, 255, 255, 0.25);
+}
+
+/* === Action Buttons === */
+.action-buttons {
+    position: relative;
+    width: 140px;
+    height: 140px;
+}
+
+.action-btn {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(145deg, #2a2a3e, #1a1a2e);
+    border: 3px solid #3a3a4e;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1rem;
+    transition: all 0.1s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    touch-action: manipulation;
+    color: white;
+}
+
+.action-btn:active,
+.action-btn.pressed {
+    transform: scale(0.92);
+}
+
+/* Layout 1: ABXY Diamond - All buttons visible */
+.action-btn.btn-a {
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(145deg, var(--green-a), #388e3c);
+    border-color: var(--green-a);
+    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+}
+
+.action-btn.btn-b {
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    background: linear-gradient(145deg, var(--red-b), #d32f2f);
+    border-color: var(--red-b);
+    box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3);
+}
+
+.action-btn.btn-x {
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    background: linear-gradient(145deg, var(--blue-btn), #42a5f5);
+    border-color: var(--blue-btn);
+    box-shadow: 0 4px 15px rgba(92, 107, 192, 0.3);
+}
+
+.action-btn.btn-y {
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(145deg, var(--yellow-y), #ffb300);
+    border-color: var(--yellow-y);
+    color: #1a1a2e;
+    box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
+}
+
+/* Layout 2: AB Horizontal - Only A&B visible */
+.action-buttons.layout-ab .btn-a {
+    bottom: auto;
+    top: 50%;
+    transform: translateY(-50%);
+    right: 0;
+    left: auto;
+    background: linear-gradient(145deg, var(--green-a), #388e3c);
+    border-color: var(--green-a);
+}
+
+.action-buttons.layout-ab .btn-b {
+    right: auto;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    background: linear-gradient(145deg, var(--red-b), #d32f2f);
+    border-color: var(--red-b);
+}
+
+.action-buttons.layout-ab .btn-x,
+.action-buttons.layout-ab .btn-y {
+    display: none;
+}
+
+/* Layout 3: XY Horizontal - Only X&Y visible */
+.action-buttons.layout-xy .btn-a,
+.action-buttons.layout-xy .btn-b {
+    display: none;
+}
+
+.action-buttons.layout-xy .btn-x {
+    left: 0;
+    right: auto;
+    top: 50%;
+    transform: translateY(-50%);
+    background: linear-gradient(145deg, var(--blue-btn), #42a5f5);
+    border-color: var(--blue-btn);
+}
+
+.action-buttons.layout-xy .btn-y {
+    top: 50%;
+    transform: translateY(-50%);
+    left: auto;
+    right: 0;
+    background: linear-gradient(145deg, var(--yellow-y), #ffb300);
+    border-color: var(--yellow-y);
+    color: #1a1a2e;
+}
+
+/* Pressed states */
+.action-btn.btn-a:active,
+.action-btn.btn-a.pressed {
+    background: linear-gradient(145deg, #66bb6a, var(--green-a));
+    box-shadow: 0 2px 10px rgba(76, 175, 80, 0.5);
+}
+
+.action-btn.btn-b:active,
+.action-btn.btn-b.pressed {
+    background: linear-gradient(145deg, #ef5350, var(--red-b));
+    box-shadow: 0 2px 10px rgba(244, 67, 54, 0.5);
+}
+
+.action-btn.btn-x:active,
+.action-btn.btn-x.pressed {
+    background: linear-gradient(145deg, #64b5f6, var(--blue-btn));
+    box-shadow: 0 2px 10px rgba(92, 107, 192, 0.5);
+}
+
+.action-btn.btn-y:active,
+.action-btn.btn-y.pressed {
+    background: linear-gradient(145deg, #ffd54f, var(--yellow-y));
+    box-shadow: 0 2px 10px rgba(255, 193, 7, 0.5);
+}
+
+/* === Shoulder Buttons === */
+.shoulder-buttons {
+    position: fixed;
+    top: 20px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 60px;
+    z-index: 99;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.shoulder-buttons:not(.visible) {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.shoulder-btn {
+    width: 90px;
+    height: 45px;
+    background: linear-gradient(180deg, #3a3a4e, #2a2a3e);
+    border: 3px solid #4a4a5e;
+    border-radius: 10px 10px 18px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.1s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    touch-action: manipulation;
+}
+
+.shoulder-btn:active,
+.shoulder-btn.pressed {
+    background: linear-gradient(180deg, #7986cb, var(--highlight));
+    color: #fff;
+    border-color: var(--highlight);
+    transform: translateY(2px);
+    box-shadow: 0 2px 10px rgba(92, 107, 192, 0.5);
+}
+
+/* Button elements inside virtual buttons */
+.shoulder-btn button,
+.action-btn button,
+.center-btn button {
+    all: unset;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: inherit;
+    font: inherit;
+    touch-action: manipulation;
+}
+
+/* === Center Buttons === */
+.center-buttons {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+    padding: 10px;
+    z-index: 98;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+
+
+.center-btn {
+    width: 70px;
+    height: 30px;
+    background: linear-gradient(145deg, #3a3a4e, #2a2a3e);
+    border: 2px solid #4a4a5e;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.1s ease;
+    touch-action: manipulation;
+    text-transform: uppercase;
+}
+
+.center-btn:active,
+.center-btn.pressed {
+    background: linear-gradient(145deg, #7986cb, var(--highlight));
+    color: #fff;
+    border-color: var(--highlight);
+    transform: scale(0.95);
+}
+
+.center-btn:not(.visible) {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* === Fullscreen Mode === */
+:fullscreen .emulator-container,
+:-webkit-full-screen .emulator-container {
+    background: #000;
+}
+
+:fullscreen .screen-container,
+:-webkit-full-screen .screen-container {
+    padding: 20px;
+}
+
+:fullscreen .shoulder-buttons,
+:-webkit-full-screen .shoulder-buttons {
+    top: 30px;
+    padding: 0 100px;
+}
+
+:fullscreen .gamepad-container,
+:-webkit-full-screen .gamepad-container {
+    bottom: 80px !important;
+    padding: 0 60px !important;
+}
+
+:fullscreen .center-buttons,
+:-webkit-full-screen .center-buttons {
+    bottom: 15px;
+}
+
+/* === Fullscreen Settings Panel === */
+:fullscreen .settings-panel,
+:-webkit-full-screen .settings-panel {
+    z-index: 2000;
+}
+
+:fullscreen .help-modal,
+:-webkit-full-screen .help-modal {
+    z-index: 3000;
+}
