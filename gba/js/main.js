@@ -265,6 +265,12 @@ let gba;
 				}
 			}
 
+			function resumeAudio() {
+				if (gba && gba.audio && gba.audio.context && gba.audio.context.state !== 'running') {
+					gba.audio.context.resume();
+				}
+			}
+
 			document.addEventListener(
 				'webkitfullscreenchange',
 				function () {
@@ -279,6 +285,8 @@ let gba;
 							(document.body.offsetHeight / 2) * 3
 						);
 						canvas.setAttribute('style', 'margin: 0');
+						// iOS Safari 进入全屏后会暂停 AudioContext，需要恢复
+						resumeAudio();
 					} else {
 						canvas.setAttribute('height', 320);
 						canvas.setAttribute('width', 480);
@@ -307,6 +315,8 @@ let gba;
 							(document.body.offsetHeight / 2) * 3
 						);
 						canvas.setAttribute('style', 'margin: 0');
+						// iOS Safari 进入全屏后会暂停 AudioContext，需要恢复
+						resumeAudio();
 					} else {
 						canvas.setAttribute('height', 320);
 						canvas.setAttribute('width', 480);
@@ -333,6 +343,8 @@ let gba;
 				} else {
 					// 进入全屏
 					const emulator = document.getElementById('emulatorContainer') || document.body;
+					// iOS: 在用户手势中恢复 AudioContext，比 fullscreenchange 事件更可靠
+					resumeAudio();
 					if (emulator.requestFullscreen) {
 						emulator.requestFullscreen();
 					} else if (emulator.webkitRequestFullscreen) {
