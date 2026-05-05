@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <link rel="icon" type="image/ico" href="logo.ico" />
+    <title>WebGBA - 浏览器 GBA 模拟器</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="ui/styles/main.css" />
+</head>
+
+<body>
+    <!-- Main Emulator Area -->
+    <div class="emulator-container" id="emulatorContainer">
+        <!-- Help Modal -->
+        <div class="help-modal" id="helpModal">
+            <div class="help-modal-content">
+                <div class="help-modal-header">
+                    <h3><i class="fa-solid fa-keyboard"></i> 键盘控制说明</h3>
+                    <div class="help-modal-close" onclick="toggleHelpModal()"><i class="fa-solid fa-times"></i></div>
+                </div>
+                
+                <div class="help-section">
+                    <h4>方向键</h4>
+                    <div class="help-key-row">
+                        <span class="help-label">方向:</span>
+                        <span class="help-key">↑</span>
+                        <span class="help-key">↓</span>
+                        <span class="help-key">←</span>
+                        <span class="help-key">→</span>
+                    </div>
+                </div>
+
+                <div class="help-section">
+                    <h4>动作键</h4>
+                    <div class="help-key-row">
+                        <span class="help-label">A:</span>
+                        <span class="help-key">X</span>
+                        <span class="help-label">B:</span>
+                        <span class="help-key">Z</span>
+                        <span class="help-label">X:</span>
+                        <span class="help-key">S</span>
+                        <span class="help-label">Y:</span>
+                        <span class="help-key">A</span>
+                    </div>
+                </div>
+
+                <div class="help-section">
+                    <h4>功能键</h4>
+                    <div class="help-key-row">
+                        <span class="help-label">Start:</span>
+                        <span class="help-key">Enter</span>
+                        <span class="help-label">Select:</span>
+                        <span class="help-key">\</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Shoulder Buttons -->
+        <div class="shoulder-buttons" id="shoulderButtons">
+            <div class="shoulder-btn" id="btnL"><button type="button">L</button></div>
+            <div class="shoulder-btn" id="btnR"><button type="button">R</button></div>
+        </div>
+
+        <div class="screen-container">
+            <div class="screen-bezel">
+                <div class="fps-overlay" id="fpsOverlay">
+                    <span id="fpsValue">--</span><span class="fps-unit"> FPS</span>
+                </div>
+                <canvas id="screen" class="game" width="480" height="320"></canvas>
+                <!-- Load ROM Hint -->
+                <div class="load-hint" id="loadHint">
+                    <div class="load-hint-icon"><i class="fa-solid fa-gamepad"></i></div>
+                    <h2>点击或拖放加载游戏</h2>
+                    <p>支持 .gba 和 .bin 格式</p>
+                </div>
+                <!-- Settings Panel -->
+                <div class="settings-panel" id="settingsPanel">
+                    <!-- Tabs -->
+                    <div class="settings-tabs">
+                        <button class="settings-tab active" data-tab="game"><i class="fa-solid fa-gamepad"></i> 游戏</button>
+                        <button class="settings-tab" data-tab="layout"><i class="fa-solid fa-layout-grid"></i> 布局</button>
+                    </div>
+
+                    <!-- Tab Content -->
+                    <div class="settings-content">
+                        <!-- Game Tab -->
+                        <div class="settings-tab-content active" id="tab-game">
+                            <div class="settings-column">
+                                <h4>游戏控制</h4>
+                                <div class="settings-group">
+                                    <div class="settings-row">
+                                        <button class="settings-btn" onclick="fullScreen()"><i class="fa-solid fa-expand"></i> 全屏模式</button>
+                                        <button class="settings-btn" id="btnPause" onclick="togglePause()"><i class="fa-solid fa-pause"></i> 暂停游戏</button>
+                                    </div>
+                                    <div class="settings-row">
+                                        <button class="settings-btn" id="btnSave" onclick="gba.downloadSavedata()"><i class="fa-solid fa-floppy-disk"></i> 保存存档</button>
+                                        <button class="settings-btn" id="btnLoad" onclick="document.getElementById('saveloader').click()"><i class="fa-solid fa-folder-open"></i> 加载存档</button>
+                                        <input class="file-input" id="saveloader" type="file" onchange="uploadSavedataPending(this.files[0]);" />
+                                    </div>
+                                    <button class="settings-btn settings-btn-danger" id="closeRom"><i class="fa-solid fa-xmark"></i> 关闭游戏</button>
+                                </div>
+                            </div>
+                            <div class="settings-column">
+                                <h4>游戏速度</h4>
+                                <div class="settings-group">
+                                    <div class="speed-control">
+                                        <input type="range" id="speedSlider" min="1" max="7" value="3" step="1" onchange="setGameSpeed(this.value)" />
+                                        <span class="speed-label" id="speedLabel">1x</span>
+                                    </div>
+                                </div>
+                                <h4>显示设置</h4>
+                                <div class="settings-group">
+                                    <label class="switch">
+                                        <input type="checkbox" id="pixelToggle" checked onchange="setPixelated(this.checked)" />
+                                        <span class="slider"></span>
+                                    </label>
+                                    <span class="switch-label">像素化显示</span>
+                                </div>
+                                <h4>音效设置</h4>
+                                <div class="settings-group">
+                                    <label class="switch">
+                                        <input type="checkbox" id="soundToggle" checked onchange="toggleSound(this.checked)" />
+                                        <span class="slider"></span>
+                                    </label>
+                                    <span class="switch-label">启用音效</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Layout Tab -->
+                        <div class="settings-tab-content" id="tab-layout">
+                            <div class="settings-column">
+                                <h4>方向控制</h4>
+                                <div class="settings-group">
+                                    <label>
+                                        <input type="radio" name="dpadMode" value="dpad" id="modeDpad" checked
+                                            onchange="setControlMode('dpad')" />
+                                        <span>十字键</span>
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="dpadMode" value="joystick" id="modeJoystick"
+                                            onchange="setControlMode('joystick')" />
+                                        <span>虚拟摇杆</span>
+                                    </label>
+                                </div>
+                                <h4>按钮配置</h4>
+                                <div class="settings-group">
+                                    <label>
+                                        <input type="radio" name="btnConfig" value="ab" id="configAB" checked
+                                            onchange="setButtonConfig('ab')" />
+                                        <span>A & B</span>
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="btnConfig" value="xy" id="configXY"
+                                            onchange="setButtonConfig('xy')" />
+                                        <span>X & Y</span>
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="btnConfig" value="all" id="configAll"
+                                            onchange="setButtonConfig('all')" />
+                                        <span>A & B & X & Y</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="settings-column">
+                                <h4>虚拟按键</h4>
+                                <div class="settings-group">
+                                    <label class="switch">
+                                        <input type="checkbox" id="virtualButtonsToggle" checked onchange="toggleVirtualButtons(this.checked)" />
+                                        <span class="slider"></span>
+                                    </label>
+                                    <span class="switch-label">显示虚拟按键</span>
+                                </div>
+                                <h4>帧率显示</h4>
+                                <div class="settings-group">
+                                    <label class="switch">
+                                        <input type="checkbox" id="fpsToggle" onchange="toggleFpsDisplay(this.checked)" />
+                                        <span class="slider"></span>
+                                    </label>
+                                    <span class="switch-label">显示帧率</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Help Button -->
+                    <div class="settings-help" onclick="toggleHelpModal()"><i class="fa-solid fa-question-circle"></i> 键盘帮助</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Virtual Gamepad -->
+        <div class="gamepad-container" id="gamepadContainer">
+            <div class="gamepad-half">
+                <!-- Joystick -->
+                <div class="joystick-container" id="joystickContainer">
+                    <div class="joystick-base"></div>
+                    <div class="joystick-handle" id="joystickHandle"></div>
+                </div>
+                <!-- D-Pad -->
+                <div class="dpad-container" id="dpadContainer">
+                    <div class="dpad-base"></div>
+                    <div class="dpad-btn dpad-up" id="dpadUp">▲</div>
+                    <div class="dpad-btn dpad-down" id="dpadDown">▼</div>
+                    <div class="dpad-btn dpad-left" id="dpadLeft">◀</div>
+                    <div class="dpad-btn dpad-right" id="dpadRight">▶</div>
+                </div>
+            </div>
+
+            <div class="gamepad-half">
+                <div class="action-buttons" id="actionButtons">
+                    <div class="action-btn btn-y" id="btnY"><button type="button">Y</button></div>
+                    <div class="action-btn btn-x" id="btnX"><button type="button">X</button></div>
+                    <div class="action-btn btn-b" id="btnB"><button type="button">B</button></div>
+                    <div class="action-btn btn-a" id="btnA"><button type="button">A</button></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Center Buttons -->
+        <div class="center-buttons visible" id="centerButtons">
+            <div class="center-btn" id="btnSelect"><button type="button">Select</button></div>
+            <div class="center-btn" id="btnMenu"><button type="button"><i class="fa-solid fa-bars"></i></button></div>
+            <div class="center-btn" id="btnStart"><button type="button">Start</button></div>
+        </div>
+    </div>
+
+    <!-- Hidden elements required by main.js -->
+    <div id="controls" style="display: none;">
+        <div id="preload">
+            <button id="select" onclick="document.getElementById('loader').click()">Seleccionar</button>
+        </div>
+        <div id="ingame" style="display: none;">
+            <button id="pause" onclick="togglePause()">Pausa</button>
+            <label id="pixelated">
+                <input type="checkbox" onchange="setPixelated(this.checked)" />
+                Pixelado
+            </label>
+            <div id="sound">
+                <input type="checkbox" onchange="gba.audio.masterEnable = this.checked; if (gba.audio.context.state !== 'running') {gba.audio.context.resume();}" />
+                Sonido
+            </div>
+        </div>
+    </div>
+    <div id="crash" style="display: none;"></div>
+    <input type="file" id="saveloader" style="display: none;" onchange="uploadSavedataPending(this.files[0]);" />
+
+    <!-- Hidden File Input -->
+    <input type="file" class="file-input" id="loader" accept=".gba" onchange="run(this.files[0]);" />
+
+    <script src="gba/js/util.js"></script>
+    <script src="gba/js/core.js"></script>
+    <script src="gba/js/arm.js"></script>
+    <script src="gba/js/thumb.js"></script>
+    <script src="gba/js/mmu.js"></script>
+    <script src="gba/js/io.js"></script>
+    <script src="gba/js/audio.js"></script>
+    <script src="gba/js/video.js"></script>
+    <script src="gba/js/video/proxy.js"></script>
+    <script src="gba/js/video/software.js"></script>
+    <script src="gba/js/irq.js"></script>
+    <script src="gba/js/keypad.js"></script>
+    <script src="gba/js/sio.js"></script>
+    <script src="gba/js/savedata.js"></script>
+    <script src="gba/js/gpio.js"></script>
+    <script src="gba/js/gba.js"></script>
+    <script src="gba/js/main.js"></script>
+    <script src="gba/resources/xhr.js"></script>
+    <script src="gba/resources/biosbin.js"></script>
+
+    <script src="ui/scripts/ui.js"></script>
+</body>
+</html>
